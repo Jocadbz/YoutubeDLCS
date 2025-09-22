@@ -41,4 +41,31 @@ public class youtubeDL
 
         return process.ExitCode;
     }
+    int DownloadPlaylist(string playlistUrl, string outputDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(playlistUrl))
+            throw new ArgumentException("Playlist URL cannot be null or empty.", nameof(playlistUrl));
+        
+        if (string.IsNullOrWhiteSpace(outputDirectory))
+            throw new ArgumentException("Output directory cannot be null or empty.", nameof(outputDirectory));
+        
+        if (!Directory.Exists(outputDirectory))
+            Directory.CreateDirectory(outputDirectory);
+
+        var processInfo = new ProcessStartInfo
+        {
+            FileName = _path,
+            Arguments = $"-o \"{Path.Combine(outputDirectory, "%(playlist)s/%(title)s.%(ext)s")}\" {playlistUrl}",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using var process = new Process { StartInfo = processInfo };
+        process.Start();
+        process.WaitForExit();
+
+        return process.ExitCode;
+    }
 }
