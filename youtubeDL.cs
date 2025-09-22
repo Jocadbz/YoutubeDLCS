@@ -1,0 +1,44 @@
+﻿namespace YoutubeDLCS;
+
+public class youtubeDL
+{
+    private readonly string _path;
+
+    public youtubeDL(string path)
+    {
+        _path = path;
+        if (!File.Exists(_path))
+            throw new FileNotFoundException("youtube-dl executable not found at the specified path.", _path);
+        
+        if (string.IsNullOrWhiteSpace(_path))
+            throw new ArgumentException("Path cannot be null or empty.", nameof(path));
+    }
+
+    public int Download(string url, string outputDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            throw new ArgumentException("URL cannot be null or empty.", nameof(url));
+        
+        if (string.IsNullOrWhiteSpace(outputDirectory))
+            throw new ArgumentException("Output directory cannot be null or empty.", nameof(outputDirectory));
+        
+        if (!Directory.Exists(outputDirectory))
+            Directory.CreateDirectory(outputDirectory);
+
+        var processInfo = new ProcessStartInfo
+        {
+            FileName = _path,
+            Arguments = $"-o \"{Path.Combine(outputDirectory, "%(title)s.%(ext)s")}\" {url}",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using var process = new Process { StartInfo = processInfo };
+        process.Start();
+        process.WaitForExit();
+
+        return process.ExitCode;
+    }
+}
