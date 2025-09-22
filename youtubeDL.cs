@@ -3,6 +3,7 @@
 public class youtubeDL
 {
     private readonly string _path;
+    
 
     public youtubeDL(string path)
     {
@@ -14,7 +15,7 @@ public class youtubeDL
             throw new ArgumentException("Path cannot be null or empty.", nameof(path));
     }
 
-    public int Download(string url, string outputDirectory)
+    public int Download(string url, string outputDirectory, string? format = null)
     {
         if (string.IsNullOrWhiteSpace(url))
             throw new ArgumentException("URL cannot be null or empty.", nameof(url));
@@ -25,10 +26,11 @@ public class youtubeDL
         if (!Directory.Exists(outputDirectory))
             Directory.CreateDirectory(outputDirectory);
 
+        var formatArg = string.IsNullOrWhiteSpace(format) ? "" : $"-f {format} ";
         var processInfo = new ProcessStartInfo
         {
             FileName = _path,
-            Arguments = $"-o \"{Path.Combine(outputDirectory, "%(title)s.%(ext)s")}\" {url}",
+            Arguments = $"{formatArg}-o \"{Path.Combine(outputDirectory, "%(title)s.%(ext)s")}\" {url}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -41,7 +43,7 @@ public class youtubeDL
 
         return process.ExitCode;
     }
-    int DownloadPlaylist(string playlistUrl, string outputDirectory)
+    public int DownloadPlaylist(string playlistUrl, string outputDirectory, string? format = null)
     {
         if (string.IsNullOrWhiteSpace(playlistUrl))
             throw new ArgumentException("Playlist URL cannot be null or empty.", nameof(playlistUrl));
@@ -52,10 +54,11 @@ public class youtubeDL
         if (!Directory.Exists(outputDirectory))
             Directory.CreateDirectory(outputDirectory);
 
+        var formatArg = string.IsNullOrWhiteSpace(format) ? "" : $"-f {format} ";
         var processInfo = new ProcessStartInfo
         {
             FileName = _path,
-            Arguments = $"-o \"{Path.Combine(outputDirectory, "%(playlist)s/%(title)s.%(ext)s")}\" {playlistUrl}",
+            Arguments = $"{formatArg}-o \"{Path.Combine(outputDirectory, "%(playlist)s/%(title)s.%(ext)s")}\" {playlistUrl}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
