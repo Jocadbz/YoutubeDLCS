@@ -1,4 +1,5 @@
-﻿namespace YoutubeDLCS;
+﻿using System.Diagnostics;
+namespace YoutubeDLCS;
 
 public class youtubeDL
 {
